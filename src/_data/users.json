@@ -1,0 +1,8 @@
+[
+    {
+        "firstName": "Super",
+        "lastName": "Administrator",
+        "email": "super@commerce.com",
+        "password": "#Payload.$1"
+    }
+]
