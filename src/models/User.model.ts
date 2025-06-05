@@ -2,6 +2,7 @@ import mongoose, { Schema, Model, ObjectId } from 'mongoose'
 import { IUserDoc } from '../utils/interfaces.util';
 import slugify from 'slugify';
 import Role from './Role.model';
+import bcrypt, { hash } from 'bcryptjs'
 
 const UserSchema = new Schema(
     {
@@ -55,7 +56,15 @@ const UserSchema = new Schema(
 UserSchema.set('toJSON', { getters: true, virtuals: true });
 
 UserSchema.pre<IUserDoc>('save', async function (next) {
+
+    if (!this.isModified('password')) {
+        return next()
+    }
+
     this.slug = slugify(this.email, { lower: true });
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+
     next();
 })
 
@@ -64,11 +73,11 @@ UserSchema.methods.hasRole = async (name: string, roles: Array<ObjectId | any>):
     let flag: boolean = false;
     const _role = await Role.findOne({ name });
 
-    if(_role){
+    if (_role) {
 
-        for(let i = 0; i < roles.length; i++){
+        for (let i = 0; i < roles.length; i++) {
 
-            if(roles[i].toString() === _role._id.toString()){
+            if (roles[i].toString() === _role._id.toString()) {
                 flag = true;
                 break;
             } else {
@@ -80,6 +89,20 @@ UserSchema.methods.hasRole = async (name: string, roles: Array<ObjectId | any>):
     }
 
     return flag;
+
+}
+
+UserSchema.methods.matchPassword = async function (password: string) {
+
+    let isMatched: boolean = false;
+
+    if (this.password && this.password.toString() !== '') {
+        isMatched = await bcrypt.compare(password, this.password);
+    }else {
+        isMatched = false;
+    }
+
+    return isMatched;
 
 }
 

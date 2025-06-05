@@ -32,7 +32,7 @@ const seedData = async () => {
     await seedRoles();
     await seedusers();
 
-    attachSuperRole()
+    await attachSuperRole();
 }
 
 export default seedData;

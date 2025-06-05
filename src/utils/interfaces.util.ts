@@ -35,4 +35,5 @@ export interface IUserDoc extends Document {
 
     // functions
     hasRole(name: string, roles: Array<ObjectId | any>): Promise<boolean>
+    matchPassword(password: string): Promise<boolean>
 }
