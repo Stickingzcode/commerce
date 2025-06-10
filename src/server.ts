@@ -21,8 +21,15 @@ const init = async (): Promise<void> => {
 // initialize server
 init()
 
-const PORT = process.env.PORT || 5000;
+
+const PORT = process.env.PORT || 5001;
 
 const server = app.listen(PORT, () => {
     console.log(colors.yellow.bold(`Server running in ${process.env.NODE_ENV} mode on PORT ${PORT}`))
 });
+
+// catch unhandled promise rejections
+process.on('unhandledRejection', (err: any, promise) => {
+    console.log(colors.red(`err: ${err.message}`));
+    server.close(() => process.exit(1));
+})
