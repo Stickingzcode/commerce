@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express'
 import { config } from 'dotenv'
 import bodyParser from 'body-parser'
+import routes from '../routes/routes.router'
 
 config() ///
 
@@ -28,4 +29,5 @@ app.get('/', (req: Request, res: Response, next: NextFunction) => {
 
 })
 
+app.use('/v1', routes);
 export default app;
