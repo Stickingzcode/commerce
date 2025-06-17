@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express'
 import { config } from 'dotenv'
 import bodyParser from 'body-parser'
 import routes from '../routes/routes.router'
+import morgan from 'morgan'
 
 config() ///
 
@@ -12,6 +13,8 @@ app.use(express.urlencoded({ limit: '50mb', extended: false }))
 
 app.use(bodyParser.json({ limit: '50mb' }))
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: false }))
+
+app.use(morgan('dev'))
 
 app.get('/', (req: Request, res: Response, next: NextFunction) => {
 
@@ -29,5 +32,5 @@ app.get('/', (req: Request, res: Response, next: NextFunction) => {
 
 })
 
-app.use('/v1', routes);
+app.use(`${process.env.API_ROUTE}`, routes);
 export default app;
