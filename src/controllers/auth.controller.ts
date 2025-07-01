@@ -1,31 +1,16 @@
 import { Request, Response, NextFunction } from 'express'
 import { RegisterDTO } from '../dtos/auth.dto';
 import { UserTypeEnum } from '../utils/enums.util';
+import AuthService from '../services/auth.service';
 
-export const register = (req: Request, res: Response, next: NextFunction) => {
-
-    const allowed: Array<string> = [UserTypeEnum.VENDOR, UserTypeEnum.CUSTOMER]
+export const register = async (req: Request, res: Response, next: NextFunction) => {
 
     const { email, password, userType } = <RegisterDTO>req.body;
 
-    if(!userType){
-        throw new Error('user type is required')
-    }
+    const validate = await AuthService.validateRegister(req.body);
 
-    if(!allowed.includes(userType)){
-        throw new Error(`invalid user type. choose from ${allowed.join(',')}`)
-    }
-
-    if(!email){
-        throw new Error('email is required')
-    }
-
-    if(!password){
-        throw new Error('password is required')
-    }
-
-    if(password.length < 8){
-        throw new Error('password characters must not be less than 8')
+    if(validate.error){
+        
     }
     
     // custom error class/function

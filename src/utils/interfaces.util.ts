@@ -1,5 +1,12 @@
 import { Document, ObjectId } from 'mongoose'
 
+export interface IResult{
+    error: boolean, 
+    message: string, 
+    code: number, 
+    data: any
+}
+
 export interface IRoleDoc extends Document {
 
     name: string,
