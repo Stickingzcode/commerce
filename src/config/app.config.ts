@@ -3,6 +3,7 @@ import { config } from 'dotenv'
 import bodyParser from 'body-parser'
 import routes from '../routes/routes.router'
 import morgan from 'morgan'
+import errorHandler from '../middleware/error.middleware'
 
 config() ///
 
@@ -33,4 +34,7 @@ app.get('/', (req: Request, res: Response, next: NextFunction) => {
 })
 
 app.use(`${process.env.API_ROUTE}`, routes);
+
+app.use(errorHandler)
+
 export default app;

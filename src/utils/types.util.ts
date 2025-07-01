@@ -1,0 +1,1 @@
+export type ErrorsType = Array<string> | Array<number> | Array<{ mesage: string, field: string }>;
