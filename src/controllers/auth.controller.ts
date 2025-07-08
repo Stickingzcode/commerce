@@ -49,7 +49,13 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     res.status(200).json({
         error: false,
         errors: [],
-        data: user,
+        data: {
+            _id: user._id,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            roles: user.roles,
+        },
         message: 'successful',
         status: 200
     })
