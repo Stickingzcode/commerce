@@ -29,6 +29,12 @@ export interface IUserDoc extends Document {
     lastName: string,
     email: string,
     password: string,
+    userType: string,
+    isSuper: boolean,
+    isAdmin: boolean,
+    isVendor: boolean,
+    isCustomer: boolean,
+    isUser: boolean,
     slug: string
 
     roles: Array<ObjectId | any>

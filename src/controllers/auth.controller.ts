@@ -5,6 +5,8 @@ import AuthService from '../services/auth.service';
 import ErrorResponse from '../utils/error.util';
 import { PASSWORD_REGXP_ERROR } from '../utils/constants.util';
 import UserService from '../services/user.service';
+import User from '../models/User.model';
+import { UserType } from '../utils/types.util';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -17,12 +19,16 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     }
     
     // validate email
-    const isEmailMatch = await UserService.checkEmail(email)
+    const isEmailMatch = await UserService.checkEmail(email);
     if(!isEmailMatch){
         return next(new ErrorResponse('Error', 400, ['invalid email supplied']));
     }
 
-    //TODO: validate existing email
+    // validate existing user
+    const isExist = await UserService.userExists(email);
+    if(isExist){
+        return next(new ErrorResponse('Error', 422, ['email already exist']))
+    }
 
     // validate the password
     const isPassMatch = await UserService.checkPassword(password);
@@ -30,13 +36,20 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
         return next(new ErrorResponse('Error', 400, [`invalid password supplied. ${PASSWORD_REGXP_ERROR}`]));
     }
 
-    // save user details
-    // send welcome/verification email 
+    const user = await UserService.createUser({
+        email: email,
+        password: password,
+        userType: userType as UserType,
+        firstName: `New ${userType}`,
+        lastName: 'User'
+    });
+
+    // send welcome/verification email
 
     res.status(200).json({
         error: false,
         errors: [],
-        data: {},
+        data: user,
         message: 'successful',
         status: 200
     })

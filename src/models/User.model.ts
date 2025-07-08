@@ -29,6 +29,33 @@ const UserSchema = new Schema(
             select: false,
         },
 
+        userType: {
+            type: String,
+            enum: ['superadmin', 'admin', 'vendor', 'customer', 'user'],
+            default: 'user',
+        },
+
+        isSuper: {
+            type: Boolean,
+            default: false
+        },
+        isAdmin: {
+            type: Boolean,
+            default: false
+        },
+        isVendor: {
+            type: Boolean,
+            default: false
+        },
+        isCustomer: {
+            type: Boolean,
+            default: false
+        },
+        isUser: {
+            type: Boolean,
+            default: false
+        },
+
         slug: {
             type: String,
             default: ''
@@ -98,7 +125,7 @@ UserSchema.methods.matchPassword = async function (password: string) {
 
     if (this.password && this.password.toString() !== '') {
         isMatched = await bcrypt.compare(password, this.password);
-    }else {
+    } else {
         isMatched = false;
     }
 
