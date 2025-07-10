@@ -1,5 +1,18 @@
 import { Document, ObjectId } from 'mongoose'
 
+export interface ISGOptions{
+    apiKey: string,
+    to: string | Array<string>;
+    from: string;
+    subject: string;
+    text: string;
+    html: any;
+}
+
+export interface INodemailer{
+    send(data: ISGOptions, callback: CallableFunction): void
+}
+
 export interface IResult{
     error: boolean, 
     message: string, 
