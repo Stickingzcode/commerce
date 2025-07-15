@@ -48,7 +48,10 @@ export interface IUserDoc extends Document {
     isVendor: boolean,
     isCustomer: boolean,
     isUser: boolean,
-    slug: string
+    slug: string,
+
+    activationToken: string,
+    activationTokenExpire: Date | any;
 
     roles: Array<ObjectId | any>
 
@@ -61,5 +64,6 @@ export interface IUserDoc extends Document {
 
     // functions
     hasRole(name: string, roles: Array<ObjectId | any>): Promise<boolean>
-    matchPassword(password: string): Promise<boolean>
+    matchPassword(password: string): Promise<boolean>,
+    getActivationToken(): Promise<{ token: string, hash: string }>,
 }

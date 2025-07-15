@@ -46,6 +46,10 @@ RoleSchema.pre<IRoleDoc>('save', async function (next) {
     next();
 })
 
+RoleSchema.methods.getAllRoles = async function name() {
+    return await Role.find({})
+}
+
 // define the model
 const Role: Model<IRoleDoc> = mongoose.model<IRoleDoc>('Role', RoleSchema);
 

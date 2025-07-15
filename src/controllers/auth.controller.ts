@@ -44,7 +44,13 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
         lastName: 'User'
     });
 
-    // send welcome/verification email
+    // generate and hash verification token
+    const { token, hash } = await user.getActivationToken()
+    user.activationToken = hash;
+    user.activationTokenExpire = Date.now() + 10 * 60 * 1000; // 10 mins;
+    await user.save();
+
+    // send verification email
 
     res.status(200).json({
         error: false,

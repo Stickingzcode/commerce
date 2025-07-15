@@ -1,8 +1,10 @@
+import crypto from 'crypto'
 import mongoose, { Schema, Model, ObjectId } from 'mongoose'
 import { IUserDoc } from '../utils/interfaces.util';
 import slugify from 'slugify';
 import Role from './Role.model';
 import bcrypt, { hash } from 'bcryptjs'
+import SystemService from '../services/system.service';
 
 const UserSchema = new Schema(
     {
@@ -60,6 +62,9 @@ const UserSchema = new Schema(
             type: String,
             default: ''
         },
+
+        activationToken: String,
+        activationTokenExpire: mongoose.Schema.Types.Mixed,
 
         roles: [
             {
@@ -130,6 +135,15 @@ UserSchema.methods.matchPassword = async function (password: string) {
     }
 
     return isMatched;
+
+}
+
+UserSchema.methods.getActivationToken = async function () {
+
+    const token = crypto.randomBytes(20).toString('hex');
+    const hash = await SystemService.hashToken(token)
+
+    return { token, hash };
 
 }
 
