@@ -18,7 +18,7 @@ class AuthService {
         const allowedUsers: Array<string> = [UserTypeEnum.VENDOR, UserTypeEnum.CUSTOMER]
 
         let result: IResult = { error: false, message: '', code: 200, data: null }
-        const { email, password, userType } = data;
+        const { email, password, userType, callbackUrl } = data;
 
         if (!email) {
             result.error = true;
@@ -36,6 +36,10 @@ class AuthService {
             result.error = true;
             result.code = 400;
             result.message = `invalid user type. choose from ${allowedUsers.join(',')}`
+        } else if (!callbackUrl) {
+            result.error = true;
+            result.code = 400;
+            result.message = 'callback url is required'
         } else {
             result.error = false;
             result.code = 200;

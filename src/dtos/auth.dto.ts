@@ -1,5 +1,6 @@
 export interface RegisterDTO{
     email: string,
     password: string,
-    userType: string
+    userType: string,
+    callbackUrl: string
 }

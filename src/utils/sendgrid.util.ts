@@ -17,7 +17,8 @@ class Sendgrid implements INodemailer{
             from: data.from,
             subject: data.subject,
             text: data.text,
-            html: data.html
+            html: data.html,
+            replyTo: data.replyTo
         })
         .then((resp) => {
             callback(resp)

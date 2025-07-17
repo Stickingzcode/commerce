@@ -7,6 +7,7 @@ export interface ISGOptions{
     subject: string;
     text: string;
     html: any;
+    replyTo?: string
 }
 
 export interface INodemailer{

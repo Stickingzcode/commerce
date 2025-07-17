@@ -7,10 +7,11 @@ import { PASSWORD_REGXP_ERROR } from '../utils/constants.util';
 import UserService from '../services/user.service';
 import User from '../models/User.model';
 import { UserType } from '../utils/types.util';
+import EmailService from '../services/email.service';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
 
-    const { email, password, userType } = <RegisterDTO>req.body;
+    const { email, password, userType, callbackUrl } = <RegisterDTO>req.body;
 
     const validate = await AuthService.validateRegister(req.body);
 
@@ -51,6 +52,19 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     await user.save();
 
     // send verification email
+    await EmailService.sendTokenVerifyEmail({
+        driver: 'sengrid',
+        email: user.email,
+        template: 'verify_token',
+        title: 'Verify Your Email',
+        fromName: 'Victoria from Commerce',
+        preheader: 'Confirm your email address',
+        options: {
+            salute: `Champ`,
+            buttonText: 'Verify Email',
+            buttonUrl: `${callbackUrl}/${token}`
+        }
+    })
 
     res.status(200).json({
         error: false,
