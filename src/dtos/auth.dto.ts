@@ -4,3 +4,9 @@ export interface RegisterDTO{
     userType: string,
     callbackUrl: string
 }
+
+export interface ActivateAcccountDTO{
+    type: string,
+    token: string,
+    code: string
+}

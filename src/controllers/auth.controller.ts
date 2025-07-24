@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
-import { RegisterDTO } from '../dtos/auth.dto';
-import { UserTypeEnum } from '../utils/enums.util';
+import { ActivateAcccountDTO, RegisterDTO } from '../dtos/auth.dto';
+import { UserTypeEnum, VerifyTypeEnum } from '../utils/enums.util';
 import AuthService from '../services/auth.service';
 import ErrorResponse from '../utils/error.util';
 import { PASSWORD_REGXP_ERROR } from '../utils/constants.util';
@@ -8,7 +8,15 @@ import UserService from '../services/user.service';
 import User from '../models/User.model';
 import { UserType } from '../utils/types.util';
 import EmailService from '../services/email.service';
+import SystemService from '../services/system.service';
 
+/**
+ * @name register
+ * @param req 
+ * @param res 
+ * @param next 
+ * @returns 
+ */
 export const register = async (req: Request, res: Response, next: NextFunction) => {
 
     const { email, password, userType, callbackUrl } = <RegisterDTO>req.body;
@@ -76,6 +84,35 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
             lastName: user.lastName,
             roles: user.roles,
         },
+        message: 'successful',
+        status: 200
+    })
+
+}
+
+export const activateAccount = async (req: Request, res: Response, next: NextFunction) => {
+
+    const { token, type, code } = <ActivateAcccountDTO>req.body;
+
+    const validate = await AuthService.validateActivate(req.body);
+
+    if(validate.error){
+        return next(new ErrorResponse('Error', validate.code!, [validate.message]))
+    }
+
+    if(type === VerifyTypeEnum.TOKEN){
+
+    }
+
+
+    if(type === VerifyTypeEnum.CODE){
+        
+    }
+
+    res.status(200).json({
+        error: false,
+        errors: [],
+        data: {},
         message: 'successful',
         status: 200
     })

@@ -5,3 +5,8 @@ export enum UserTypeEnum {
     CUSTOMER = 'customer',
     USER = 'user'
 }
+
+export enum VerifyTypeEnum{
+    TOKEN = 'token',
+    CODE = 'code'
+}
