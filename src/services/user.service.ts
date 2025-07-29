@@ -72,7 +72,8 @@ class UserService {
                 password: password,
                 userType: userType,
                 firstName: firstName,
-                lastName: lastName
+                lastName: lastName,
+                isActive: true
             });
 
             // attach user role

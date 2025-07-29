@@ -28,10 +28,10 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     }
     
     // validate email
-    const isEmailMatch = await UserService.checkEmail(email);
-    if(!isEmailMatch){
-        return next(new ErrorResponse('Error', 400, ['invalid email supplied']));
-    }
+    // const isEmailMatch = await UserService.checkEmail(email);
+    // if(!isEmailMatch){
+    //     return next(new ErrorResponse('Error', 400, ['invalid email supplied']));
+    // }
 
     // validate existing user
     const isExist = await UserService.userExists(email);
@@ -58,6 +58,8 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     user.activationToken = hash;
     user.activationTokenExpire = Date.now() + 10 * 60 * 1000; // 10 mins;
     await user.save();
+
+    console.log(token)
 
     // send verification email
     await EmailService.sendTokenVerifyEmail({
@@ -102,8 +104,21 @@ export const activateAccount = async (req: Request, res: Response, next: NextFun
 
     if(type === VerifyTypeEnum.TOKEN){
 
-    }
+        const hash = await SystemService.hashToken(token);
+        const today = Date.now(); // 
 
+        const user = await User.findOne({ activationToken: hash, activationTokenExpire: { $gte: today } });
+
+        if(!user){
+            return next(new ErrorResponse('Error', 403, ['invalid activation token']))
+        }
+
+        user.isActivated = true;
+        user.activationToken = undefined;
+        user.activationTokenExpire = undefined;
+        await user.save();
+
+    }
 
     if(type === VerifyTypeEnum.CODE){
         

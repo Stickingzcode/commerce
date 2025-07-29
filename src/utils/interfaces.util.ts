@@ -49,9 +49,11 @@ export interface IUserDoc extends Document {
     isVendor: boolean,
     isCustomer: boolean,
     isUser: boolean,
+    isActivated: boolean,
+    isActive: boolean,
     slug: string,
 
-    activationToken: string,
+    activationToken: string | undefined,
     activationTokenExpire: Date | any;
 
     roles: Array<ObjectId | any>

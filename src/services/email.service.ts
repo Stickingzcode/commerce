@@ -53,7 +53,7 @@ class EmailService {
                         }
 
                         sendgrid.send(mailData, (resp: any) => {
-                            // console.log('SENDGRID',resp)
+                            console.log('SENDGRID',resp)
                         });
 
                     } catch (err) {

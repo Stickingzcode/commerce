@@ -57,6 +57,14 @@ const UserSchema = new Schema(
             type: Boolean,
             default: false
         },
+        isActivated: {
+            type: Boolean,
+            default: false
+        },
+        isActive: {
+            type: Boolean,
+            default: false
+        },
 
         slug: {
             type: String,
