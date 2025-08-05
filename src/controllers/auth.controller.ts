@@ -6,7 +6,7 @@ import ErrorResponse from '../utils/error.util';
 import { PASSWORD_REGXP_ERROR } from '../utils/constants.util';
 import UserService from '../services/user.service';
 import User from '../models/User.model';
-import { UserType } from '../utils/types.util';
+import { EmailDriver, UserType } from '../utils/types.util';
 import EmailService from '../services/email.service';
 import SystemService from '../services/system.service';
 
@@ -63,7 +63,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
     // send verification email
     await EmailService.sendTokenVerifyEmail({
-        driver: 'sengrid',
+        driver: (process.env.EMAIL_DRIVER || 'zepto') as EmailDriver,
         email: user.email,
         template: 'verify_token',
         title: 'Verify Your Email',

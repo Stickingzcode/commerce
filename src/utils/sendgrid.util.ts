@@ -6,7 +6,7 @@ class Sendgrid implements INodemailer{
     constructor() {}
 
     /**
-     * @name send
+     * @name call
      * @param data 
      * @param callback 
      */

@@ -18,6 +18,24 @@ export interface SendWithSendgridDTO {
     replyTo?: string
 }
 
+export interface SendWithZeptoDTO {
+    engine: 'ejs' | 'hbs',
+    email: string,
+    fromEmail: string,
+    fromName?: string,
+    emailTitle: string,
+    template: string,
+    preheaderText: string,
+    emailSalute: string,
+    bodyOne?: string,
+    bodyTwo?: string,
+    bodyThree?: string,
+    code?: string,
+    buttonText?: string,
+    buttonUrl?: string,
+    replyTo?: string
+}
+
 export interface SendEmailDTO {
     email: string,
     title: string,

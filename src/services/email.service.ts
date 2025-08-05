@@ -1,7 +1,9 @@
-import { SendEmailDTO, SendWithSendgridDTO } from "../dtos/email.dto";
+import { SendEmailDTO, SendWithSendgridDTO, SendWithZeptoDTO } from "../dtos/email.dto";
 import { renderFile } from 'ejs'
 import appRootPath from 'app-root-path'
 import sendgrid from '../utils/sendgrid.util'
+import zepto from '../utils/zepto.util'
+import { IResult } from "../utils/interfaces.util";
 
 class EmailService {
 
@@ -73,6 +75,69 @@ class EmailService {
     }
 
     /**
+     * @name sendWithZepto
+     * @description Sends email with zeptomail transporter and ejs/hbs
+     * @param data 
+     */
+    private async sendWithZepto(data: SendWithZeptoDTO): Promise<void> {
+
+        const sourceUrl = `${appRootPath.path}/src`;
+
+        if (data.engine === 'ejs') {
+
+            renderFile(
+                `${sourceUrl}/views/ejs/${data.template}.ejs`,
+                {
+                    email: data.email,
+                    emailTitle: data.emailTitle,
+                    preheaderText: data.preheaderText,
+                    emailSalute: data.emailSalute,
+                    bodyOne: data.bodyOne,
+                    bodyTwo: data.bodyTwo,
+                    bodyThree: data.bodyThree,
+                    code: data.code,
+                    buttonText: data.buttonText,
+                    buttonUrl: data.buttonUrl
+                },
+
+                {},
+
+                async (error, html) => {
+
+                    try {
+
+                        const mailData: any = {
+                            to: [{ email: data.email, name: '' }],
+                            fromEmail: process.env.ZEPTO_FROM_EMAIL,
+                            fromName: `${data.fromName ? data.fromName : process.env.EMAIL_FROM_NAME}`,
+                            subject: data.emailTitle,
+                            text: 'email',
+                            html: html,
+                            replyTo: data.replyTo ? [{ email: data.replyTo, name: '' }] : []
+                        };
+
+                        zepto.send(mailData, (resp: IResult) => {
+                            console.log("ZEPTO", resp)
+                        })
+
+
+                    } catch (err) {
+                        console.log('ZEPTO-ERROR', err)
+                    }
+
+                }
+            )
+
+        }
+
+        if (data.engine === 'hbs') {
+
+        }
+
+
+    }
+
+    /**
      * @name sendTokenVerifyEmail
      * @param data 
      */
@@ -104,8 +169,21 @@ class EmailService {
 
         }
 
-        if(driver === 'aws'){
-            /// call AWS function
+        if(driver === 'zepto'){
+            
+            await this.sendWithZepto({
+                engine: 'ejs',
+                email: email,
+                fromEmail: process.env.EMAIL_FROM_EMAIL || '',
+                fromName: fromName,
+                preheaderText: preheader,
+                emailSalute: salute,
+                emailTitle: title,
+                template: template,
+                buttonText: bText,
+                buttonUrl: bUrl
+            })
+
         }
 
     }
