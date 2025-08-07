@@ -56,6 +56,9 @@ export interface IUserDoc extends Document {
     activationToken: string | undefined,
     activationTokenExpire: Date | any;
 
+    emailCode: string | undefined,
+    emailCodeExpire: Date | any
+
     roles: Array<ObjectId | any>
 
     // timestamps

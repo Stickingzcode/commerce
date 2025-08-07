@@ -10,23 +10,16 @@ import { EmailDriver, UserType } from '../utils/types.util';
 import EmailService from '../services/email.service';
 import SystemService from '../services/system.service';
 
-/**
- * @name register
- * @param req 
- * @param res 
- * @param next 
- * @returns 
- */
 export const register = async (req: Request, res: Response, next: NextFunction) => {
 
-    const { email, password, userType, callbackUrl } = <RegisterDTO>req.body;
+    const { email, password, userType, callbackUrl, verifyType } = <RegisterDTO>req.body;
 
     const validate = await AuthService.validateRegister(req.body);
 
-    if(validate.error){
+    if (validate.error) {
         return next(new ErrorResponse('Error', validate.code, [`${validate.message}`]))
     }
-    
+
     // validate email
     // const isEmailMatch = await UserService.checkEmail(email);
     // if(!isEmailMatch){
@@ -35,13 +28,13 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
     // validate existing user
     const isExist = await UserService.userExists(email);
-    if(isExist){
+    if (isExist) {
         return next(new ErrorResponse('Error', 422, ['email already exist']))
     }
 
     // validate the password
     const isPassMatch = await UserService.checkPassword(password);
-    if(!isPassMatch){
+    if (!isPassMatch) {
         return next(new ErrorResponse('Error', 400, [`invalid password supplied. ${PASSWORD_REGXP_ERROR}`]));
     }
 
@@ -53,28 +46,51 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
         lastName: 'User'
     });
 
-    // generate and hash verification token
-    const { token, hash } = await user.getActivationToken()
-    user.activationToken = hash;
-    user.activationTokenExpire = Date.now() + 10 * 60 * 1000; // 10 mins;
-    await user.save();
+    if (verifyType === VerifyTypeEnum.TOKEN) {
 
-    console.log(token)
+        // generate and hash verification token
+        const { token, hash } = await user.getActivationToken()
+        user.activationToken = hash;
+        user.activationTokenExpire = Date.now() + 10 * 60 * 1000; // 10 mins;
+        await user.save();
 
-    // send verification email
-    await EmailService.sendTokenVerifyEmail({
-        driver: (process.env.EMAIL_DRIVER || 'zepto') as EmailDriver,
-        email: user.email,
-        template: 'verify_token',
-        title: 'Verify Your Email',
-        fromName: 'Victoria from Commerce',
-        preheader: 'Confirm your email address',
-        options: {
-            salute: `Champ`,
-            buttonText: 'Verify Email',
-            buttonUrl: `${callbackUrl}/${token}`
-        }
-    })
+        // send verification email
+        await EmailService.sendTokenVerifyEmail({
+            driver: (process.env.EMAIL_DRIVER || 'zepto') as EmailDriver,
+            email: user.email,
+            template: 'verify_token',
+            title: 'Verify Your Email',
+            fromName: 'Victoria from Commerce',
+            preheader: 'Confirm your email address',
+            options: {
+                salute: `Champ`,
+                buttonText: 'Verify Email',
+                buttonUrl: `${callbackUrl}/${token}`
+            }
+        })
+
+    }
+
+    if (verifyType === VerifyTypeEnum.CODE) {
+
+        // generate and save code
+        const otp = await UserService.generateOTP(user._id);
+
+        // send verification email
+        await EmailService.sendOTPVerifyEmail({
+            driver: (process.env.EMAIL_DRIVER || 'zepto') as EmailDriver,
+            email: user.email,
+            template: 'verify_otp',
+            title: 'Verify Your Email',
+            fromName: 'Victoria from Commerce',
+            preheader: 'Confirm your email address',
+            options: {
+                code: otp,
+                salute: `Champ`,
+            }
+        })
+
+    }
 
     res.status(200).json({
         error: false,
@@ -98,18 +114,18 @@ export const activateAccount = async (req: Request, res: Response, next: NextFun
 
     const validate = await AuthService.validateActivate(req.body);
 
-    if(validate.error){
+    if (validate.error) {
         return next(new ErrorResponse('Error', validate.code!, [validate.message]))
     }
 
-    if(type === VerifyTypeEnum.TOKEN){
+    if (type === VerifyTypeEnum.TOKEN) {
 
         const hash = await SystemService.hashToken(token);
         const today = Date.now(); // 
 
         const user = await User.findOne({ activationToken: hash, activationTokenExpire: { $gte: today } });
 
-        if(!user){
+        if (!user) {
             return next(new ErrorResponse('Error', 403, ['invalid activation token']))
         }
 
@@ -120,8 +136,21 @@ export const activateAccount = async (req: Request, res: Response, next: NextFun
 
     }
 
-    if(type === VerifyTypeEnum.CODE){
-        
+    if (type === VerifyTypeEnum.CODE) {
+
+        const today = Date.now(); // 
+
+        const user = await User.findOne({ emailCode: code, emailCodeExpire: { $gte: today } });
+
+        if (!user) {
+            return next(new ErrorResponse('Error', 403, ['invalid activation token']))
+        }
+
+        user.isActivated = true;
+        user.emailCode = undefined;
+        user.emailCodeExpire = undefined;
+        await user.save();
+
     }
 
     res.status(200).json({

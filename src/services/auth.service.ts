@@ -16,10 +16,11 @@ class AuthService {
      */
     public async validateRegister(data: RegisterDTO): Promise<IResult> {
 
+        const allowedTypes = ['code', 'token'];
         const allowedUsers: Array<string> = [UserTypeEnum.VENDOR, UserTypeEnum.CUSTOMER]
 
         let result: IResult = { error: false, message: '', code: 200, data: null }
-        const { email, password, userType, callbackUrl } = data;
+        const { email, password, userType, callbackUrl, verifyType } = data;
 
         if (!email) {
             result.error = true;
@@ -41,6 +42,14 @@ class AuthService {
             result.error = true;
             result.code = 400;
             result.message = 'callback url is required'
+        } else if (!verifyType) {
+            result.error = true;
+            result.code = 400;
+            result.message = 'verify type is required'
+        } else if (!allowedTypes.includes(verifyType)) {
+            result.error = true;
+            result.code = 400;
+            result.message = `invalid verify type. choose from ${allowedTypes.join(',')}`
         } else {
             result.error = false;
             result.code = 200;

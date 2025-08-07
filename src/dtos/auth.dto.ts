@@ -3,6 +3,7 @@ export interface RegisterDTO{
     password: string,
     userType: string,
     callbackUrl: string
+    verifyType: string
 }
 
 export interface ActivateAcccountDTO{

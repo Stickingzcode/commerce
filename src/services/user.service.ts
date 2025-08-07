@@ -4,6 +4,7 @@ import User from "../models/User.model";
 import { UserTypeEnum } from "../utils/enums.util";
 import { IRoleDoc, IUserDoc } from "../utils/interfaces.util";
 import { UserType } from "../utils/types.util";
+import Random from "./random.service";
 
 class UserService {
 
@@ -119,6 +120,29 @@ class UserService {
         }
 
         return user;
+
+    }
+
+    /**
+     * @name generateOTP
+     * @param id 
+     * @returns 
+     */
+    public async generateOTP(id: Object): Promise<string>{
+
+        let otp: string = '000000';
+        const user = await User.findOne({ _id: id });
+
+        if(user){
+
+            otp = Random.randomNum(6);
+            user.emailCode = otp;
+            user.emailCodeExpire = Date.now() + 10 * 60 * 1000; // 10 mins;
+            await user.save();
+
+        }
+
+        return otp;
 
     }
 

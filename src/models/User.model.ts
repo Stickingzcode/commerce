@@ -74,6 +74,9 @@ const UserSchema = new Schema(
         activationToken: String,
         activationTokenExpire: mongoose.Schema.Types.Mixed,
 
+        emailCode: String,
+        emailCodeExpire: mongoose.Schema.Types.Mixed,
+
         roles: [
             {
                 type: mongoose.Schema.Types.Mixed,

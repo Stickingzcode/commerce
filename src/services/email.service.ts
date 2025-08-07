@@ -188,6 +188,54 @@ class EmailService {
 
     }
 
+    /**
+     * @name sendOTPVerifyEmail
+     * @param data 
+     */
+    public async sendOTPVerifyEmail(data: SendEmailDTO): Promise<void> {
+
+        const { driver, email, title, options } = data;
+
+        let template = data.template ? data.template : 'verify_otp';
+        let fromName = data.fromName ? data.fromName : process.env.EMAIL_FROM_NAME || 'Commerce';
+        let preheader = data.preheader ? data.preheader : title;
+        let salute = options && options.salute ? options.salute : 'Champ'
+        let code = options && options.code ? options.code : '000000'
+
+        if(driver === 'sengrid'){
+
+            await this.sendWithSendgrid({
+                engine: 'ejs',
+                email: email,
+                fromEmail: process.env.EMAIL_FROM_EMAIL || '',
+                fromName: fromName,
+                preheaderText: preheader,
+                emailSalute: salute,
+                emailTitle: title,
+                template: template,
+                code: code
+            })
+
+        }
+
+        if(driver === 'zepto'){
+            
+            await this.sendWithZepto({
+                engine: 'ejs',
+                email: email,
+                fromEmail: process.env.EMAIL_FROM_EMAIL || '',
+                fromName: fromName,
+                preheaderText: preheader,
+                emailSalute: salute,
+                emailTitle: title,
+                template: template,
+                code: code
+            })
+
+        }
+
+    }
+
 }
 
 export default new EmailService()
