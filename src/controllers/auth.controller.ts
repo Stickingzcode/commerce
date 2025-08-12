@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { ActivateAcccountDTO, RegisterDTO } from '../dtos/auth.dto';
+import { ActivateAcccountDTO, LoginDTO, RegisterDTO } from '../dtos/auth.dto';
 import { UserTypeEnum, VerifyTypeEnum } from '../utils/enums.util';
 import AuthService from '../services/auth.service';
 import ErrorResponse from '../utils/error.util';
@@ -9,6 +9,8 @@ import User from '../models/User.model';
 import { EmailDriver, UserType } from '../utils/types.util';
 import EmailService from '../services/email.service';
 import SystemService from '../services/system.service';
+import UserRepository from '../repositories/user.repository';
+import { ObjectId } from 'mongoose';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -108,6 +110,36 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
 }
 
+export const login = async (req: Request, res: Response, next: NextFunction) => {
+
+    const { email, password } = <LoginDTO>req.body;
+
+    const validate = await AuthService.validateLogin(req.body);
+    
+    if(validate.error){
+        return next(new ErrorResponse('Error', validate.code!, [`${validate.message}`]))
+    }
+
+    const user = await UserRepository.findByEmailSelectPassword(email);
+
+    if(!user){
+        return next(new ErrorResponse('Error', 404, [`incorrect login credentials`]))
+    }
+
+    if(!user.isActive){
+        return next(new ErrorResponse('Error', 403, [`inactive user account`]))
+    }
+
+    const isMatched = await user.matchPassword(password);
+
+    if(!isMatched){
+        return next(new ErrorResponse('Error', 403, [`incorrect login credentials`]))
+    }
+
+    sendTokenResponse(user._id, res);
+
+}
+
 export const activateAccount = async (req: Request, res: Response, next: NextFunction) => {
 
     const { token, type, code } = <ActivateAcccountDTO>req.body;
@@ -157,6 +189,29 @@ export const activateAccount = async (req: Request, res: Response, next: NextFun
         error: false,
         errors: [],
         data: {},
+        message: 'successful',
+        status: 200
+    })
+
+}
+
+const sendTokenResponse = async (id: ObjectId, res: Response) => {
+
+    let token: string = '';
+    const user = await UserRepository.findById(id);
+
+    if(user){
+        token = await AuthService.generateAuthToken({ id: user._id, email: user.email, roles: user.roles })
+    }
+
+    res.status(200).json({
+        error: false,
+        errors: [],
+        data: {
+            email: user?.email,
+            _id: user?._id
+        },
+        token: token,
         message: 'successful',
         status: 200
     })

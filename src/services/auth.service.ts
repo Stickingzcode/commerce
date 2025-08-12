@@ -1,7 +1,8 @@
-import { ActivateAcccountDTO, RegisterDTO } from "../dtos/auth.dto";
+import { ActivateAcccountDTO, GenerateAuthTokenDTO, LoginDTO, RegisterDTO } from "../dtos/auth.dto";
 import { UserTypeEnum, VerifyTypeEnum } from "../utils/enums.util";
 import { IResult } from "../utils/interfaces.util";
 import SystemService from "./system.service";
+import jwt from 'jsonwebtoken'
 
 class AuthService {
 
@@ -95,6 +96,51 @@ class AuthService {
         }
 
         return result;
+
+    }
+
+    /**
+     * @name validateLogin
+     * @param data 
+     * @returns 
+     */
+    public async validateLogin(data: LoginDTO): Promise<IResult> {
+
+        let result: IResult = { error: false, message: '', code: 200, data: null }
+
+        const { email, password } = data;
+
+        if (!email) {
+            result.error = true;
+            result.message = 'email is required';
+            result.code = 400;
+        } else if (!password) {
+            result.error = true;
+            result.message = 'password is required';
+            result.code = 400;
+        } else {
+            result.error = false;
+            result.message = '';
+            result.code = 200;
+        }
+
+        return result;
+
+    }
+
+    /**
+     * @name generateAuthToken
+     * @param data 
+     * @returns 
+     */
+    public async generateAuthToken(data: GenerateAuthTokenDTO): Promise<string>{
+
+        const secret = process.env.JWT_SECRET || '';
+        const expire = 60 * 60 * (parseInt(process.env.JWT_EXPIRE || ''));
+
+        const signed = jwt.sign(data, secret, { expiresIn: expire })
+
+        return signed
 
     }
 
