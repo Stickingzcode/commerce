@@ -51,6 +51,12 @@ export interface IUserDoc extends Document {
     isUser: boolean,
     isActivated: boolean,
     isActive: boolean,
+    isLocked: boolean,
+    login: {
+        last: Date | any,
+        method: string,
+        limit: number
+    }
     slug: string,
 
     activationToken: string | undefined,

@@ -5,6 +5,7 @@ import slugify from 'slugify';
 import Role from './Role.model';
 import bcrypt, { hash } from 'bcryptjs'
 import SystemService from '../services/system.service';
+import { LoginMethodEnum } from '../utils/enums.util';
 
 const UserSchema = new Schema(
     {
@@ -64,6 +65,27 @@ const UserSchema = new Schema(
         isActive: {
             type: Boolean,
             default: false
+        },
+
+        isLocked: {
+            type: Boolean,
+            default: false
+        },
+
+        login: {
+            last: {
+                type: mongoose.Schema.Types.Mixed,
+                default: null
+            },
+            method: {
+                type: String,
+                enum: SystemService.enumToArray(LoginMethodEnum, 'values-only'),
+                default: LoginMethodEnum.EMAIL
+            },
+            limit: {
+                type: Number,
+                default: 0
+            }
         },
 
         slug: {

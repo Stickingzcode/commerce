@@ -1,6 +1,6 @@
 import { ObjectId } from "mongoose"
 
-export interface RegisterDTO{
+export interface RegisterDTO {
     email: string,
     password: string,
     userType: string,
@@ -8,19 +8,34 @@ export interface RegisterDTO{
     verifyType: string
 }
 
-export interface LoginDTO{
+export interface LoginDTO {
     email: string,
     password: string
 }
 
-export interface ActivateAcccountDTO{
+export interface ActivateAcccountDTO {
     type: string,
     token: string,
     code: string
 }
 
-export interface GenerateAuthTokenDTO{
+export interface GenerateAuthTokenDTO {
     id: ObjectId
     email: string,
     roles: Array<ObjectId>
+}
+
+
+// Mappers
+export interface MapLoginResponseDTO {
+    _id: ObjectId,
+    id: ObjectId,
+    email: string,
+    userType: string,
+    isSuper: boolean,
+    isAdmin: boolean,
+    isVendor: boolean,
+    isCustomer: boolean,
+    isUser: boolean,
+    roles: Array<string>
 }
