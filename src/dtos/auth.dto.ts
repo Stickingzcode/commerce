@@ -1,4 +1,5 @@
 import { ObjectId } from "mongoose"
+import { LoginMethod } from "../utils/types.util"
 
 export interface RegisterDTO {
     email: string,
@@ -10,7 +11,9 @@ export interface RegisterDTO {
 
 export interface LoginDTO {
     email: string,
-    password: string
+    password: string,
+    method: LoginMethod,
+    hash?: string
 }
 
 export interface ActivateAcccountDTO {

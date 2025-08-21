@@ -11,6 +11,13 @@ export enum VerifyTypeEnum{
     CODE = 'code'
 }
 
+export enum APPChannelEmun{
+    WEB = 'web',
+    MOBILE = 'mobile',
+    DESKTOP = 'desktop',
+    WATCH = 'watch'
+}
+
 export enum LoginMethodEnum{
     EMAIL = 'email',
     BIOMETRIC = 'biometric',

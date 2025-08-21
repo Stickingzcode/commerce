@@ -13,6 +13,7 @@ import UserRepository from '../repositories/user.repository';
 import { ObjectId } from 'mongoose';
 import AuthMapper from '../mappers/auth.mapper';
 
+
 export const register = async (req: Request, res: Response, next: NextFunction) => {
 
     const { email, password, userType, callbackUrl, verifyType } = <RegisterDTO>req.body;
@@ -113,9 +114,9 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
 
-    const { email, password } = <LoginDTO>req.body;
+    const { email, password, method, hash } = <LoginDTO>req.body;
 
-    const validate = await AuthService.validateLogin(req.body);
+    const validate = await AuthService.validateLogin(req.body, req.channel!);
 
     if (validate.error) {
         return next(new ErrorResponse('Error', validate.code!, [`${validate.message}`]))
@@ -135,40 +136,48 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         return next(new ErrorResponse('Error', 403, [`account currently locked`]))
     }
 
-    const isMatched = await user.matchPassword(password);
-
     if (!user.isSuper) {
 
-        if (!isMatched) {
+        if(method === LoginMethodEnum.EMAIL){
 
-            if (user.login.limit >= 3) {
-
-                if (!user.isLocked) {
-                    user.isLocked = true;
-                    await user.save();
-                }
-
-                return next(new ErrorResponse('Error', 403, [`account currently locked for 30 minutes`]))
-
-            } else if (user.login.limit < 3) {
-
-                user.login.limit += 1;
-                await user.save();
-
-                if (user.login.limit === 3) {
-
-                    user.isLocked = true;
-                    await user.save();
-
+            const isMatched = await user.matchPassword(password);
+            
+            if (!isMatched) {
+    
+                if (user.login.limit >= 3) {
+    
+                    if (!user.isLocked) {
+                        user.isLocked = true;
+                        await user.save();
+                    }
+    
                     return next(new ErrorResponse('Error', 403, [`account currently locked for 30 minutes`]))
-
+    
+                } else if (user.login.limit < 3) {
+    
+                    user.login.limit += 1;
+                    await user.save();
+    
+                    if (user.login.limit === 3) {
+    
+                        user.isLocked = true;
+                        await user.save();
+    
+                        return next(new ErrorResponse('Error', 403, [`account currently locked for 30 minutes`]))
+    
+                    } else {
+                        return next(new ErrorResponse('Error', 403, [`incorrect login credentials`]))
+                    }
+    
                 } else {
                     return next(new ErrorResponse('Error', 403, [`incorrect login credentials`]))
                 }
-
-            } else {
-                return next(new ErrorResponse('Error', 403, [`incorrect login credentials`]))
             }
+
+        }
+
+        if(method === LoginMethodEnum.BIOMETRIC){
+
         }
 
         const today = new Date()
@@ -183,6 +192,8 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     }
 
     if (user.isSuper) {
+
+        const isMatched = await user.matchPassword(password);
 
         if (!isMatched) {
             return next(new ErrorResponse('Error', 403, [`incorrect login credentials`]))

@@ -4,11 +4,12 @@ import {
     activateAccount,
     login
 } from '../../controllers/auth.controller'
+import { validateChannels as vc } from '../../middleware/header.middleware';
 
 const router: Router = express.Router({ mergeParams: true });
 
 router.post('/register', register)
-router.post('/login', login)
+router.post('/login', vc, login)
 
 router.put('/activate', activateAccount)
 

@@ -1,5 +1,5 @@
 import { ActivateAcccountDTO, GenerateAuthTokenDTO, LoginDTO, RegisterDTO } from "../dtos/auth.dto";
-import { UserTypeEnum, VerifyTypeEnum } from "../utils/enums.util";
+import { APPChannelEmun, LoginMethodEnum, UserTypeEnum, VerifyTypeEnum } from "../utils/enums.util";
 import { IResult } from "../utils/interfaces.util";
 import SystemService from "./system.service";
 import jwt from 'jsonwebtoken'
@@ -104,11 +104,12 @@ class AuthService {
      * @param data 
      * @returns 
      */
-    public async validateLogin(data: LoginDTO): Promise<IResult> {
+    public async validateLogin(data: LoginDTO, channel: string): Promise<IResult> {
 
+        const allowedMethods = SystemService.enumToArray(LoginMethodEnum, 'values-only');
         let result: IResult = { error: false, message: '', code: 200, data: null }
 
-        const { email, password } = data;
+        const { email, password, method, hash } = data;
 
         if (!email) {
             result.error = true;
@@ -118,10 +119,34 @@ class AuthService {
             result.error = true;
             result.message = 'password is required';
             result.code = 400;
+        } else if (!method) {
+            result.error = true;
+            result.message = 'login method is required';
+            result.code = 400;
+        } else if (!allowedMethods.includes(method)) {
+            result.error = true;
+            result.message = `invalid login method. choose from ${allowedMethods.join(',')}`;
+            result.code = 400;
         } else {
-            result.error = false;
-            result.message = '';
-            result.code = 200;
+
+            if (method === LoginMethodEnum.BIOMETRIC && channel !== APPChannelEmun.MOBILE) {
+
+                result.error = true;
+                result.message = `invalid login method for a ${channel} device`;
+                result.code = 400;
+
+            } if (method === LoginMethodEnum.BIOMETRIC && !hash) {
+
+                result.error = true;
+                result.message = `encrypted hash is required`;
+                result.code = 400;
+
+            } else {
+                result.error = false;
+                result.message = '';
+                result.code = 200;
+            }
+
         }
 
         return result;
@@ -133,7 +158,7 @@ class AuthService {
      * @param data 
      * @returns 
      */
-    public async generateAuthToken(data: GenerateAuthTokenDTO): Promise<string>{
+    public async generateAuthToken(data: GenerateAuthTokenDTO): Promise<string> {
 
         const secret = process.env.JWT_SECRET || '';
         const expire = 60 * 60 * (parseInt(process.env.JWT_EXPIRE || ''));
