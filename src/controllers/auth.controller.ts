@@ -177,7 +177,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         }
 
         if(method === LoginMethodEnum.BIOMETRIC){
-
+            
         }
 
         const today = new Date()
