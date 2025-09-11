@@ -19,6 +19,7 @@ const connectDB = async () => {
         // connect to redis
         await REDIS.connect();
 
+        // conect to mongodb
         if(process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'production'){
             const dbConn = await mongoose.connect(process.env.MONGODB_URI || '', options)
             console.log(colors.cyan.bold(`Database Connected: ${dbConn.connection.host}`))

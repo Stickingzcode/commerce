@@ -12,6 +12,7 @@ import SystemService from '../services/system.service';
 import UserRepository from '../repositories/user.repository';
 import { ObjectId } from 'mongoose';
 import AuthMapper from '../mappers/auth.mapper';
+import logger from '../utils/logger.util';
 
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {

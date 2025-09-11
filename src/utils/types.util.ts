@@ -3,3 +3,4 @@ export type UserType = 'superadmin' | 'admin' | 'vendor' | 'customer' | 'user'
 export type EmailDriver = 'sengrid' | 'aws' | 'sendchamp' | 'mailtrap' | 'zepto' | 'brevo';
 export type HTTPMethodType = 'POST' | 'GET' | 'PUT' | 'PATCH' | 'HEAD';
 export type LoginMethod = 'email' | 'biometric' | 'sso' | 'platform';
+export type LogType = 'info' | 'warning' | 'success' | 'error' | 'any';
