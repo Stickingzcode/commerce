@@ -1,3 +1,8 @@
+import { config } from "dotenv";
+import { systemLogger } from "../config/winston.config";
+
+config()
+
 class ENV {
 
     public isDev: boolean;
@@ -8,6 +13,7 @@ class ENV {
     public APP_ENV: string;
     public PORT: string;
     public API_ROUTE: string;
+    public LOGS_PATH: string;
     public APP_CHANNELS: string;
     public MONGODB_URI: string;
     public REDIS_HOST: string;
@@ -145,6 +151,7 @@ class ENV {
         this.EMAIL_DRIVER = process.env.EMAIL_DRIVER;
         this.SUPERADMIN_EMAIL = process.env.SUPERADMIN_EMAIL;
         this.CUSTOMER_APP_URL = process.env.CUSTOMER_APP_URL;
+        this.LOGS_PATH = process.env.LOGS_PATH || 'logs';
 
         this.isDev = process.env.APP_ENV === 'development' ? true : false;
         this.isStaging = process.env.APP_ENV === 'staging' ? true : false;

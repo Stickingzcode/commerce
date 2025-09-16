@@ -1,3 +1,4 @@
+import { monitorLogger } from "../config/winston.config";
 import { LoggerDTO, LogDirectDTO } from "../dtos/system.dto";
 import ENV from "./env.util";
 import colors from 'colors'
@@ -39,7 +40,7 @@ class Logger {
                 }
 
                 if (monitor) {
-
+                    
                 }
 
             }
@@ -135,8 +136,6 @@ class Logger {
         } 
         
         else {
-
-            console.log("DISP", display)
 
             if (display) {
 
