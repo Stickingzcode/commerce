@@ -1,6 +1,7 @@
 import seedData from "./config/seeds/seeder.seed";
 import connectDB from "./config/db.config";
 import app from './config/app.config';
+import colors from "colors";
 
 const init = async (): Promise<void> => {
 
@@ -12,7 +13,7 @@ const init = async (): Promise<void> => {
 
 }
 
-init()
+init();
 
 const PORT = process.env.PORT || 5001;
 
@@ -23,4 +24,4 @@ const server = app.listen(PORT, () => {
 process.on('unhandledRejection', (err: any, promise) => {
     console.log(colors.red(`Err: ${err.message}`));
     server.close(() => process.exit(1));
-})
+});

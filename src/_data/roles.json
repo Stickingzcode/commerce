@@ -1,0 +1,22 @@
+[
+    {
+        "name": "superadmin",
+        "description": "superadmin has all the rights in the sustem"
+    },
+    {
+        "name": "admin",
+        "description": "admin has limited rights in the system"
+    },
+    {
+        "name": "vendor",
+        "description": "vendor has vendor rights in the system"
+    },
+    {
+        "name": "customer",
+        "description": "customer has customer rights in the system"
+    },
+    {
+        "name": "user",
+        "description": "user is a user of the system"
+    }
+]
